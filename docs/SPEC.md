@@ -193,13 +193,13 @@ ASTRA designs everything inside it and documents it in **`docs/ARQUITECTURA.md`*
 5. How atomic append, no-cache reads and `from` aliasing are implemented.
 6. Run instructions (start server, run client, run tests, run attack demo) in PowerShell.
 7. Risks and mitigations (e.g., serialization mismatch, partial writes, shared database file).
-8. Appendix: per-module task briefs (max 40 lines each) derived from this SPEC.
+8. Appendix: per-module task briefs (max 40 lines each) derived from this SPEC. Each brief names the module document the worker must write or update (§10).
 
 ### Build order and gates
 
-1. **Gate 1 — core:** all `tests/core` pass, including reference vectors.
-2. **Gate 2 — server and tools:** all `tests/server` pass; the attack tool works against the server's database.
-3. **Gate 3 — client and end to end:** the demo sequence works: start server → client add → show → verify → attack tool → verify.
+1. **Gate 1 — core:** all `tests/core` pass, including reference vectors; `docs/modulos/CORE.md` written.
+2. **Gate 2 — server and tools:** all `tests/server` pass; the attack tool works against the server's database; `docs/modulos/SERVER.md`, `docs/modulos/API.md` and `docs/modulos/TOOLS.md` written.
+3. **Gate 3 — client and end to end:** the demo sequence works: start server → client add → show → verify → attack tool → verify; `docs/modulos/CLIENT.md` written.
 
 No phase starts before the previous gate is passed.
 
@@ -214,6 +214,16 @@ No phase starts before the previous gate is passed.
   - `docs/README.md` — install, run, usage examples, tests, attack demo (Spanish).
   - `docs/INFORME.md` — technical report following the professor's paper template, 4–6 pages once exported to PDF (Spanish). A draft exists; update it with the real architecture, outputs and results.
   - `docs/EXPLICACION.md` — per-file and per-decision explanation for the oral defense, with 8 likely professor questions and answers (Spanish).
+- **Module documentation (living docs).** Every component has its own document, created and updated **in the same task** that creates or changes the component. Spanish, max ~100 lines each, no copying of this SPEC (reference its sections instead):
+  - `docs/modulos/CORE.md` — public interface of `core`, hashing and verifier explained, how to run its tests.
+  - `docs/modulos/SERVER.md` — structure, configuration (environment variables), storage, how to start it, error handling.
+  - `docs/modulos/API.md` — API reference: every endpoint with method, path, request, response, status codes, error codes and a PowerShell example (`Invoke-RestMethod` or `curl.exe`). Must match the live OpenAPI schema.
+  - `docs/modulos/CLIENT.md` — commands and menu options, configuration, example sessions, error messages.
+  - `docs/modulos/TOOLS.md` — attack simulator and reset options, the demo recipe, and which finding code each option triggers.
+  - `docs/CHANGELOG.md` — one line per merged change: date, component, what changed.
+- Each module document contains: purpose, files and responsibilities, public interface, configuration, how to run and test, examples, known limitations.
+- Any new endpoint, command, option, error code or environment variable must appear in its document **before** the task is reported as done. If behavior changes, the same task updates the document and adds a CHANGELOG line.
+- A gate (§9) does not pass unless the module's document exists and matches the code.
 - Code comments and docstrings in Spanish. Clean, readable, consistent naming.
 - Never invent bibliographic references.
 
@@ -226,6 +236,7 @@ No phase starts before the previous gate is passed.
 - [ ] Report complete, with real screenshots, limitations and improvements (15).
 - [ ] Code commented and clean (5).
 - [ ] All tests pass at the three gates; the end-to-end demo works.
+- [ ] Every module document in `docs/modulos/` exists, matches the code, and each change is listed in `docs/CHANGELOG.md`.
 - [ ] The owner can explain every file orally (`docs/EXPLICACION.md` reviewed).
 
 ## 12. Process constraints
@@ -235,3 +246,4 @@ No phase starts before the previous gate is passed.
 - Maximum 2 fix rounds per module; on the third failure, escalate to ASTRA with the exact error.
 - Do not refactor code whose tests pass.
 - If git is available: one branch per module (`feat/core`, `feat/server`, `feat/client`, `feat/tools`), merged only after its gate passes.
+- A task is not done until its module document (§10) is updated. The worker's report includes a `DOCS:` line.

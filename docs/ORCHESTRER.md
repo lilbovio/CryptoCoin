@@ -16,6 +16,13 @@ Hierarchy:
 - Do NOT read `docs/PRD.md`; it is for the human owner. Workers must not read it either.
 - The repository already contains `docs/`, `core/`, `server/`, `client/`, `tools/`, `tests/core/`, `tests/server/`. Do not change the top-level layout.
 
+# DOCUMENTATION AS YOU GO (mandatory)
+Documentation is part of every task, not a final step. Follow SPEC §10:
+- The worker that creates or changes `core`, `server`, API, `client` or `tools` writes or updates the matching file in `docs/modulos/` (`CORE.md`, `SERVER.md`, `API.md`, `CLIENT.md`, `TOOLS.md`) and adds one line to `docs/CHANGELOG.md`, in the same task.
+- Each brief names the document to produce. MANAGER rejects any task whose report has no `DOCS:` line or whose document does not match the code.
+- A gate passes only if the module's document exists (SPEC §9).
+- Keep each document short (max ~100 lines), in Spanish, referencing SPEC sections instead of copying them.
+
 # TOKEN RULES (mandatory)
 1. After reading SPEC.md, nobody re-reads this prompt. Do not copy the SPEC into briefs; reference its section numbers.
 2. Each worker gets ONLY: its brief (max 40 lines) + `docs/SPEC.md` + the files it must touch. Never the full history.
@@ -61,6 +68,7 @@ Review against the 100-point rubric in SPEC §11. Return a numbered defect list 
 
 ## Phase 5: documentation
 - FAST: `docs/README.md` (PowerShell install, run, tests, demo), docstrings and comments, uniform style.
+- FAST: check every `docs/modulos/*.md` against the final code and endpoints; fix any drift and log it in `docs/CHANGELOG.md`.
 - DEV: update `docs/INFORME.md`: fill section 3 with the real architecture (use `docs/ARQUITECTURA.md`) and prepare section 4 with `[CAPTURA: ...]` markers and the real test results. Follow the paper template structure already in the file. Do not invent references; tag any doubtful one `[VERIFY]`.
 - MANAGER: `docs/EXPLICACION.md`: per-file and per-decision explanation for the oral defense, plus 8 likely professor questions with answers.
 
@@ -74,6 +82,7 @@ One branch per module: `feat/core`, `feat/server`, `feat/client`, `feat/tools`. 
 ```
 FILES: <list>
 TESTS: <pass/fail + failing test name>
+DOCS: <module doc created/updated + CHANGELOG line>
 NOTES: <max 3 lines>
 ```
 

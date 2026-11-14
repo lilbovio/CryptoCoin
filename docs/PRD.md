@@ -220,6 +220,8 @@ Los tres "No" son las limitaciones que el informe debe reconocer. Las mejoras qu
 | `README.md` | Instalar, ejecutar y probar | Español | Workers rápidos |
 | `INFORME.md` | Informe técnico para el profesor | Español | Borrador existente; se completa al final |
 | `EXPLICACION.md` | Defensa oral | Español | Manager, y el responsable lo estudia |
+| `modulos/CORE.md`, `SERVER.md`, `API.md`, `CLIENT.md`, `TOOLS.md` | Documentación viva de cada componente y referencia de la API | Español | El worker que crea o cambia el componente, en la misma tarea |
+| `CHANGELOG.md` | Registro de cambios, una línea por cambio | Español | Cada worker, junto con su documento |
 
 Jerarquía ante conflictos: `SPEC.md` (técnico) > `ARQUITECTURA.md` (detalle) > resto.
 
@@ -246,6 +248,8 @@ Jerarquía ante conflictos: `SPEC.md` (técnico) > `ARQUITECTURA.md` (detalle) >
 **Para cambiar de almacenamiento** (D1, MongoDB): implementar la interfaz `Storage` en `server`, sin tocar `core`; ejecutar de nuevo las pruebas del servidor.
 
 **Para añadir firmas digitales:** extender el bloque con `signature` y `public_key`, definir en el SPEC qué se firma, y verificar la firma en `core`. Es la mejora más natural del proyecto.
+
+**Para documentar un cambio:** todo endpoint, comando, opción, código de error o variable de entorno nuevo debe aparecer en su documento de `docs/modulos/` antes de dar la tarea por terminada, y debe sumar una línea a `CHANGELOG.md`. Una compuerta no se aprueba si el documento del módulo no existe o no coincide con el código.
 
 Regla general: **cambiar primero el SPEC, luego el código**. Si el código y el SPEC discrepan, el código está mal hasta que se demuestre lo contrario.
 
