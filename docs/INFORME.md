@@ -97,17 +97,17 @@ La distinción entre `HASH_MISMATCH` y `LINK_BROKEN` es importante. Si un atacan
 
 ### 3.5 Persistencia y arquitectura
 
-Los bloques se almacenan en una base de datos SQLite, de modo que al cerrar y volver a abrir la aplicación los registros permanecen y la cadena puede verificarse. El acceso a los datos se realiza a través de una interfaz de almacenamiento independiente de la lógica criptográfica, lo que permitiría sustituir SQLite por otro respaldo sin modificar el núcleo. La aplicación está escrita en Python y utiliza únicamente su biblioteca estándar. **[COMPLETAR: resumir aquí la arquitectura definitiva (capas, módulos y diagrama) tomada de `docs/ARQUITECTURA.md`.]**
+Los bloques se almacenan en una base de datos SQLite, de modo que al cerrar y volver a abrir la aplicación los registros permanecen y la cadena puede verificarse. El acceso a los datos se realiza a través de una interfaz de almacenamiento independiente de la lógica criptográfica, lo que permitiría sustituir SQLite por otro respaldo sin modificar el núcleo. El proyecto está escrito en Python y se organiza como un monorepo con cuatro componentes: un **núcleo** (`core`) con la lógica de bloques, hash, reglas de transacción y verificación, que solo usa la biblioteca estándar y no depende de red ni de base de datos; un **servidor** (`server`) que expone una API HTTP y administra el almacenamiento SQLite; un **cliente** (`client`) de línea de comandos que se comunica con el servidor únicamente por HTTP; y una **herramienta de ataque** (`tools`) que altera la base de datos directamente. El servidor no guarda la cadena en caché, de modo que cada verificación refleja el estado actual del archivo. **[COMPLETAR: agregar el diagrama de módulos y los detalles definitivos tomados de `docs/ARQUITECTURA.md`.]**
 
 ### 3.6 Simulador de ataque
 
-Para demostrar la detección, la aplicación incluye una opción que modifica un registro pasado directamente en la base de datos, sin pasar por la lógica de la aplicación, tal como lo haría un atacante con acceso al archivo. Opcionalmente puede reescribir también el hash del bloque alterado para mostrar el caso del enlace roto. Después se ejecuta la verificación para observar el resultado.
+Para demostrar la detección, se incluye una herramienta independiente que modifica un registro pasado directamente en el archivo de la base de datos, sin pasar por el servidor ni por la lógica de la aplicación, tal como lo haría un atacante con acceso al archivo. Esta herramienta no está expuesta en la API ni en el cliente. Opcionalmente puede reescribir también el hash del bloque alterado para mostrar el caso del enlace roto. Después se ejecuta la verificación para observar el resultado.
 
 ## 4 Resultados experimentales
 
 ### 4.1 Agregar registros
 
-Se agregaron transacciones a la cadena a través de la interfaz de la aplicación. **[CAPTURA: agregar al menos tres registros, incluyendo uno que emite monedas desde SYSTEM.]**
+Se agregaron transacciones a la cadena mediante el cliente de línea de comandos, que se comunica con el servidor. **[CAPTURA: agregar al menos tres registros, incluyendo uno que emite monedas desde SYSTEM.]**
 
 **Fig. 1.** Agregando registros a la cadena. [COMPLETAR]
 
@@ -135,6 +135,8 @@ Se simularon los escenarios de la Tabla 3 sobre la cadena de ejemplo. La columna
 | Bloque 2: monto 30 → 300, hash sin cambio | `HASH_MISMATCH` e `INSUFFICIENT_BALANCE` en el bloque 2 | [COMPLETAR] |
 | Eliminar un bloque intermedio | `ID_GAP` y `LINK_BROKEN` | [COMPLETAR] |
 | Alterar varios bloques | Todos se reportan, no solo el primero | [COMPLETAR] |
+| Alterar el último bloque y recalcular su hash | **No se detecta** (limitación): ningún bloque posterior lo contradice | [COMPLETAR] |
+| Truncar la cadena (borrar los últimos bloques) | **No se detecta** (limitación): la cadena más corta sigue siendo consistente | [COMPLETAR] |
 
 **Tabla 3.** Escenarios de alteración y detección.
 
@@ -157,6 +159,8 @@ CryptoCoin demuestra que encadenar cada registro con el hash del anterior permit
 - **No hay red P2P.** No existen otras copias contra las cuales comparar.
 - **No hay firmas digitales.** Nada prueba quién creó un registro.
 - **Un atacante con control total del archivo puede reescribir consistentemente todos los hashes posteriores** a un bloque alterado, y la cadena resultante parecería válida, porque no existe un ancla externa. La detección es confiable frente a alteraciones parciales, no frente a una reescritura completa de la cadena.
+- **Alterar el último bloque y recalcular su hash no se detecta**, porque no existe un bloque posterior cuyo `prev_hash` lo contradiga.
+- **Truncar la cadena no se detecta**: si se borran los últimos bloques, la cadena restante sigue siendo consistente.
 - Los saldos se calculan reproduciendo la cadena, lo cual no escala a historiales grandes.
 
 **Mejoras posibles.**
